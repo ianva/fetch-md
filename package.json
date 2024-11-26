@@ -1,7 +1,7 @@
 {
   "name": "fetch-md",
   "version": "1.0.0",
-  "description": "A CLI tool to fetch web content and convert to markdown",
+  "description": "A CLI tool to fetch web page and convert to markdown",
   "type": "module",
   "bin": {
     "fetmd": "./dist/cli.js"
