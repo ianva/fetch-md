@@ -15,13 +15,11 @@ A CLI tool for fetching web pages and converting them to Markdown format while p
 
 ## Installation
 
-This tool is built with [Bun](https://bun.sh), a fast all-in-one JavaScript runtime & toolkit.
-
 ```bash
-# Install bun if you haven't already
-curl -fsSL https://bun.sh/install | bash
+# Using npm
+npm install -g fetch-md
 
-# Install fetch-md globally
+# Or using bun
 bun install -g fetch-md
 ```
 
@@ -125,6 +123,7 @@ output/
 ## Requirements
 
 - [Bun](https://bun.sh) runtime (version 1.0.0 or higher)
+- Node.js (version 14.17.0 or higher)
 - macOS, Linux, or WSL for Windows users
 
 ## License
