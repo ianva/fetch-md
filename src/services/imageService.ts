@@ -116,78 +116,63 @@ export class ImageService {
     return path.join(' > ');
   }
 
-  private async downloadImagesInBatches(images: ImageInfo[], outputDir: string, batchSize: number = 6): Promise<ImageInfo[]> {
-    const results: ImageInfo[] = [];
-    const totalBatches = Math.ceil(images.length / batchSize);
-    
-    // Process images in batches
-    for (let i = 0; i < images.length; i += batchSize) {
-      const batch = images.slice(i, i + batchSize);
-      const currentBatch = Math.floor(i/batchSize) + 1;
-      console.log(`Processing batch ${currentBatch} of ${totalBatches} (${batch.length} images)`);
+  async saveImages(
+    images: ImageInfo[],
+    outputDir: string,
+    onProgress?: (current: number, total: number, image: string) => void
+  ): Promise<ImageInfo[]> {
+    const batchSize = 6;
+    const batches = Math.ceil(images.length / batchSize);
+    let processedCount = 0;
+
+    for (let i = 0; i < batches; i++) {
+      const start = i * batchSize;
+      const end = Math.min(start + batchSize, images.length);
+      const batch = images.slice(start, end);
       
-      const batchPromises = batch.map(async (image) => {
-        try {
-          const urlObj = new URL(image.url);
-          const filename = urlObj.pathname.split('/').pop()?.split('?')[0] || `image-${Date.now()}.jpg`;
-          const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-          const outputPath = join(outputDir, sanitizedFilename);
-          
-          const success = await this.saveImage(image.url, outputPath);
-          if (success) {
-            image.localPath = sanitizedFilename;
-            console.log(`Successfully downloaded: ${sanitizedFilename}`);
-          } else {
-            console.warn(`Failed to download: ${image.url}`);
+      // Process batch in parallel
+      const results = await Promise.all(
+        batch.map(async (img) => {
+          const ext = this.getImageExtension(img.url);
+          if (!ext) {
+            console.warn(`Could not determine extension for ${img.url}`);
+            return { ...img, localPath: '' };
           }
-          return image;
-        } catch (error) {
-          console.warn(`Failed to process image URL ${image.url}:`, error);
-          return image;
-        }
-      });
 
-      const batchResults = await Promise.all(batchPromises);
-      results.push(...batchResults);
+          const filename = `${this.generateFilename(img.url)}.${ext}`;
+          const outputPath = join(outputDir, filename);
 
-      // Add a small delay between batches to avoid overwhelming the server
-      if (currentBatch < totalBatches) {
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
+          const success = await this.saveImage(img.url, outputPath);
+          processedCount++;
+          
+          if (onProgress) {
+            onProgress(processedCount, images.length, filename);
+          }
+
+          if (success) {
+            console.log(`Successfully downloaded: ${filename}`);
+            return { ...img, localPath: filename };
+          } else {
+            return { ...img, localPath: '' };
+          }
+        })
+      );
+
+      images.splice(start, batch.length, ...results);
     }
 
-    return results;
+    return images;
   }
 
-  async saveImages(images: ImageInfo[], outputDir: string): Promise<ImageInfo[]> {
-    if (!outputDir) {
-      throw new Error('Output directory is required');
-    }
+  private getImageExtension(url: string): string | undefined {
+    const match = url.match(/\.(jpg|jpeg|png|gif|bmp|svg|webp)$/i);
+    return match?.[1];
+  }
 
-    // Group images by domain to respect per-domain connection limits
-    const imagesByDomain = new Map<string, ImageInfo[]>();
-    
-    images.forEach(image => {
-      try {
-        const domain = new URL(image.url).hostname;
-        const domainImages = imagesByDomain.get(domain) || [];
-        domainImages.push(image);
-        imagesByDomain.set(domain, domainImages);
-      } catch (error) {
-        console.warn(`Invalid URL for image: ${image.url}`);
-      }
-    });
-
-    const results: ImageInfo[] = [];
-    
-    // Process each domain's images separately
-    for (const [domain, domainImages] of imagesByDomain) {
-      console.log(`Downloading ${domainImages.length} images from ${domain}`);
-      const domainResults = await this.downloadImagesInBatches(domainImages, outputDir);
-      results.push(...domainResults);
-    }
-
-    return results;
+  private generateFilename(url: string): string {
+    const urlObj = new URL(url);
+    const filename = urlObj.pathname.split('/').pop()?.split('?')[0] || `image-${Date.now()}`;
+    return filename.replace(/[^a-zA-Z0-9.-]/g, '_');
   }
 
   async updateImageReferences(html: string, imageMap: Map<string, string>): Promise<string> {

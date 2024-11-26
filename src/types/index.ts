@@ -41,6 +41,19 @@ export interface FetchOptions {
    * Whether to save background images.
    */
   includeBackgroundImages?: boolean;
+  /**
+   * Callback function for progress updates.
+   * 
+   * @param phase - The current phase of the operation (e.g. "downloading", "processing")
+   * @param current - The current progress (e.g. number of images downloaded)
+   * @param total - The total number of items to process
+   * @param item - Optional item being processed (e.g. image URL)
+   */
+  progressCallback?: (phase: string, current: number, total: number, item?: string) => void;
+  /**
+   * Whether to output markdown to stdout instead of a file.
+   */
+  stdoutMode?: boolean;
 }
 
 /**
@@ -54,11 +67,11 @@ export interface FetchResult {
   /**
    * Path to the generated markdown file
    */
-  outputPath: string;
+  outputPath?: string;
   /**
    * Path to the directory containing downloaded images
    */
-  imagesDir: string;
+  imagesDir?: string;
   /**
    * Number of successfully downloaded images
    */

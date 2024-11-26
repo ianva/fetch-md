@@ -36,24 +36,31 @@ export class PageService {
         .toLowerCase();
 
       // For Org mode HTML documents, try to get the content div first
-      const contentDiv = document.querySelector('#content');
+      const contentDiv = document.querySelector('#content, .content, article, main');
       if (contentDiv) {
-        // Remove the table of contents if present
-        const toc = contentDiv.querySelector('#table-of-contents');
-        if (toc) {
-          toc.remove();
-        }
+        // Remove navigation elements
+        const toRemove = contentDiv.querySelectorAll('nav, .nav, .navigation, .menu, .sidebar, .toc, #table-of-contents');
+        toRemove.forEach(el => el.remove());
         this.articleContent = contentDiv.innerHTML;
       } else {
-        // Fall back to Readability if not an Org mode document
+        // Fall back to Readability
         const reader = new Readability(document);
         const article = reader.parse();
         
         if (article) {
           this.articleContent = article.content;
         } else {
-          console.warn('Could not extract article content, falling back to full HTML');
-          this.articleContent = this.html;
+          // If Readability fails, try to get the body content
+          const body = document.querySelector('body');
+          if (body) {
+            // Remove common non-content elements
+            const toRemove = body.querySelectorAll('header, footer, nav, .nav, .navigation, .menu, .sidebar, script, style');
+            toRemove.forEach(el => el.remove());
+            this.articleContent = body.innerHTML;
+          } else {
+            console.warn('Could not extract article content, falling back to full HTML');
+            this.articleContent = this.html;
+          }
         }
       }
 
