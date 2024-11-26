@@ -1,7 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import { join, basename } from "node:path";
+import { join } from "node:path";
 import { FetchOptions, FetchResult } from './types';
-import { ImageService } from './services/imageService';
 import { MarkdownService } from './services/markdownService';
 import { PageService } from './services/pageService';
 
