@@ -1,81 +1,131 @@
 # fetch-md
 
-A TypeScript library for fetching web pages and converting them to Markdown format while preserving images.
+A CLI tool for fetching web pages and converting them to Markdown format while preserving images.
 
 ## Features
 
-- Converts HTML content to clean Markdown format
-- Downloads and saves images locally
-- Supports background images
-- Customizable viewport settings
-- Configurable wait times for dynamic content
-- Type-safe with full TypeScript support
+- 🚀 Fast and efficient web page fetching
+- 📝 Clean Markdown conversion with proper formatting
+- 🖼️ Automatically downloads and saves images
+- 🎨 Supports background images (optional)
+- ⏱️ Configurable wait times for dynamic content
+- 🎯 Selector-based waiting for SPAs
+- 📊 Progress bars and status indicators
+- 📥 Pipe support for batch processing
 
 ## Installation
 
+This tool is built with [Bun](https://bun.sh), a fast all-in-one JavaScript runtime & toolkit.
+
 ```bash
-npm install fetch-md
+# Install bun if you haven't already
+curl -fsSL https://bun.sh/install | bash
+
+# Install fetch-md globally
+bun install -g fetch-md
 ```
 
 ## Usage
 
-```typescript
-import fetchToMarkdown from 'fetch-md';
+### Basic Usage
 
-async function main() {
-  try {
-    const result = await fetchToMarkdown('https://example.com', {
-      outputDir: './output',
-      waitForSelector: 'main',
-      waitTime: 2000,
-      includeBackgroundImages: true,
-      viewport: {
-        width: 1920,
-        height: 1080
-      },
-      turndownOptions: {
-        headingStyle: 'atx',
-        codeBlockStyle: 'fenced',
-        bulletListMarker: '-'
-      }
-    });
+```bash
+# Output markdown to terminal
+fetmd https://example.com
 
-    console.log(`Markdown file saved to: ${result.markdownFile}`);
-    console.log(`Images saved to: ${result.imagesDir}`);
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
+# Save to a directory (with images)
+fetmd https://example.com output
+
+# Save to a specific path
+fetmd https://example.com ~/Documents/notes
 ```
 
-## Options
+### Advanced Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| outputDir | string | './output' | Directory where markdown and images will be saved |
-| waitForSelector | string | undefined | CSS selector to wait for before processing |
-| waitTime | number | 0 | Additional time to wait in milliseconds |
-| includeBackgroundImages | boolean | false | Whether to include CSS background images |
-| viewport | Object | {width: 1920, height: 1080} | Browser viewport dimensions |
-| turndownOptions | Object | {} | Options passed to Turndown for markdown conversion |
+```bash
+# Wait for dynamic content
+fetmd https://example.com -w 5000
 
-## Return Value
+# Wait for a specific element
+fetmd https://example.com -s "#main-content"
 
-The function returns a Promise that resolves to an object with the following properties:
+# Include background images
+fetmd https://example.com -b
 
-```typescript
-{
-  markdownFile: string;  // Path to the generated markdown file
-  imagesDir: string;     // Path to the directory containing downloaded images
-  imageCount: number;    // Number of successfully downloaded images
-  failedImages: string[]; // Array of URLs of images that failed to download
-}
+# Quiet mode (only errors)
+fetmd https://example.com -q
 ```
+
+### Batch Processing
+
+```bash
+# Process multiple URLs from a file
+cat urls.txt | fetmd
+
+# Save batch results to a directory
+cat urls.txt | fetmd - output
+
+# Process multiple URLs directly
+echo -e "https://example.com\\nhttps://github.com" | fetmd
+```
+
+## Command Line Options
+
+| Option | Description |
+|--------|-------------|
+| [url] | URL to fetch (optional if using pipe) |
+| [output] | Output directory (optional) |
+| -w, --wait <ms> | Wait time in milliseconds (default: 2000) |
+| -s, --selector <selector> | Wait for a specific CSS selector |
+| -b, --background | Include background images |
+| -q, --quiet | Quiet mode - only show errors |
+| -h, --help | Show help information |
+| -V, --version | Show version number |
+
+## Output Structure
+
+When saving to a directory, the tool creates the following structure:
+
+```
+output/
+├── [title]/
+│   ├── [title].md    # Markdown content
+│   └── images/       # Downloaded images
+│       ├── image1.jpg
+│       ├── image2.png
+│       └── ...
+```
+
+## Examples
+
+1. **Simple webpage to markdown:**
+   ```bash
+   fetmd https://example.com
+   ```
+
+2. **Save blog post with images:**
+   ```bash
+   fetmd https://blog.example.com/post-1 blog-posts
+   ```
+
+3. **Wait for dynamic content in a SPA:**
+   ```bash
+   fetmd https://app.example.com -w 5000 -s "#dynamic-content"
+   ```
+
+4. **Batch process multiple URLs:**
+   ```bash
+   # Create a file with URLs
+   echo -e "https://example.com\\nhttps://github.com" > urls.txt
+   
+   # Process all URLs
+   cat urls.txt | fetmd - website-backups
+   ```
 
 ## Requirements
 
-- Node.js 14 or higher
-- TypeScript 4.5 or higher
+- [Bun](https://bun.sh) runtime (version 1.0.0 or higher)
+- macOS, Linux, or WSL for Windows users
 
 ## License
 
