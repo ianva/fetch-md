@@ -69,10 +69,10 @@ fetmd https://example.com -q
 cat urls.txt | fetmd
 
 # Save batch results to a directory
-cat urls.txt | fetmd - output
+cat urls.txt | fetmd output
 
 # Process multiple URLs directly
-echo -e "https://example.com\\nhttps://github.com" | fetmd
+echo -e "https://example.com\\nhttps://github.com" | fetmd output
 ```
 
 ## Command Line Options
@@ -124,8 +124,8 @@ output/
    # Create a file with URLs
    echo -e "https://example.com\\nhttps://github.com" > urls.txt
    
-   # Process all URLs
-   cat urls.txt | fetmd - website-backups
+   # Process all URLs and save to directory
+   cat urls.txt | fetmd output
    ```
 
 ## Requirements
