@@ -13,31 +13,25 @@ program
   .name('fetmd')
   .description('Fetch web pages and convert them to markdown with images')
   .version('1.0.0')
-  .option('-u, --url <url>', 'URL to fetch')
-  .option('-o, --output <dir>', 'Output directory (if not specified, outputs to stdout)')
+  .argument('[url]', 'URL to fetch')
+  .argument('[output]', 'Output directory')
   .option('-w, --wait <ms>', 'Wait time in milliseconds', '2000')
   .option('-s, --selector <selector>', 'Wait for selector')
   .option('-b, --background', 'Include background images', false)
-  .option('-p, --pipe', 'Read URL from stdin', false)
   .option('-q, --quiet', 'Quiet mode - only show errors', false);
 
 program.parse();
 
 const options = program.opts();
+const [url, outputDir] = program.args;
 
-// Progress bar for batch image downloads
-const multibar = new cliProgress.MultiBar({
-  format: ' {bar} | {percentage}% | {value}/{total} | {filename}',
-  barCompleteChar: '\u2588',
-  barIncompleteChar: '\u2591',
-  hideCursor: true,
-  clearOnComplete: true,
-  stopOnComplete: true,
-}, cliProgress.Presets.shades_classic);
+// Check if we have piped input
+const hasPipedInput = !process.stdin.isTTY;
+// Check if output is being piped
+const stdoutMode = !outputDir;
 
 async function processUrl(url: string) {
   const spinner = ora();
-  const stdoutMode = !options.output;
   
   if (!options.quiet && !stdoutMode) {
     spinner.start(`Fetching ${chalk.blue(url)}`);
@@ -45,7 +39,7 @@ async function processUrl(url: string) {
 
   try {
     const result = await fetchToMarkdown(url, {
-      outputDir: options.output,
+      outputDir,
       waitTime: parseInt(options.wait),
       waitForSelector: options.selector,
       includeBackgroundImages: options.background,
@@ -133,8 +127,8 @@ async function processUrl(url: string) {
 }
 
 async function main() {
-  if (options.pipe) {
-    // Read URL from stdin
+  if (hasPipedInput) {
+    // Read URLs from stdin
     const rl = createInterface({
       input: process.stdin,
       output: process.stdout,
@@ -147,13 +141,22 @@ async function main() {
         await processUrl(url);
       }
     }
-  } else if (options.url) {
-    await processUrl(options.url);
+  } else if (url) {
+    await processUrl(url);
   } else {
-    console.error(chalk.red('Error: Please provide a URL using --url or pipe input'));
+    console.error(chalk.red('Error: Please provide a URL as argument or pipe URLs from stdin'));
     process.exit(1);
   }
 }
+
+const multibar = new cliProgress.MultiBar({
+  format: ' {bar} | {percentage}% | {value}/{total} | {filename}',
+  barCompleteChar: '\u2588',
+  barIncompleteChar: '\u2591',
+  hideCursor: true,
+  clearOnComplete: true,
+  stopOnComplete: true,
+}, cliProgress.Presets.shades_classic);
 
 main().catch(error => {
   console.error(chalk.red('Fatal error:', error));
