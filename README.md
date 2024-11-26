@@ -11,8 +11,6 @@ A CLI tool for fetching web pages and converting them to Markdown format while p
 - 📝 Clean Markdown conversion with proper formatting
 - 🖼️ Automatically downloads and saves images
 - 🎨 Supports background images (optional)
-- ⏱️ Configurable wait times for dynamic content
-- 🎯 Selector-based waiting for SPAs
 - 📊 Progress bars and status indicators
 - 📥 Pipe support for batch processing
 
@@ -49,12 +47,6 @@ fetmd https://example.com ~/Documents/notes
 ### Advanced Options
 
 ```bash
-# Wait for dynamic content
-fetmd https://example.com -w 5000
-
-# Wait for a specific element
-fetmd https://example.com -s "#main-content"
-
 # Include background images
 fetmd https://example.com -b
 
@@ -65,14 +57,15 @@ fetmd https://example.com -q
 ### Batch Processing
 
 ```bash
-# Process multiple URLs from a file
+# Process multiple URLs from a file (output to terminal)
 cat urls.txt | fetmd
 
-# Save batch results to a directory
+# Process multiple URLs and save to directory
 cat urls.txt | fetmd output
 
 # Process multiple URLs directly
-echo -e "https://example.com\\nhttps://github.com" | fetmd output
+echo "https://example.com" | fetmd
+echo "https://github.com" | fetmd output
 ```
 
 ## Command Line Options
@@ -81,8 +74,6 @@ echo -e "https://example.com\\nhttps://github.com" | fetmd output
 |--------|-------------|
 | [url] | URL to fetch (optional if using pipe) |
 | [output] | Output directory (optional) |
-| -w, --wait <ms> | Wait time in milliseconds (default: 2000) |
-| -s, --selector <selector> | Wait for a specific CSS selector |
 | -b, --background | Include background images |
 | -q, --quiet | Quiet mode - only show errors |
 | -h, --help | Show help information |
@@ -114,15 +105,16 @@ output/
    fetmd https://blog.example.com/post-1 blog-posts
    ```
 
-3. **Wait for dynamic content in a SPA:**
+3. **Save with background images:**
    ```bash
-   fetmd https://app.example.com -w 5000 -s "#dynamic-content"
+   fetmd https://example.com output -b
    ```
 
 4. **Batch process multiple URLs:**
    ```bash
    # Create a file with URLs
-   echo -e "https://example.com\\nhttps://github.com" > urls.txt
+   echo "https://example.com
+https://github.com" > urls.txt
    
    # Process all URLs and save to directory
    cat urls.txt | fetmd output
