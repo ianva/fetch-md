@@ -7,6 +7,33 @@
     "fetmd": "./dist/cli.js"
   },
   "preferGlobal": true,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "cli",
+    "markdown",
+    "webpage",
+    "converter",
+    "fetch",
+    "download",
+    "images"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/fetch-md.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/fetch-md/issues"
+  },
+  "homepage": "https://github.com/yourusername/fetch-md#readme",
+  "engines": {
+    "node": ">=14.17.0"
+  },
   "scripts": {
     "start": "bun run src/index.ts",
     "dev": "bun --watch run src/index.ts",
