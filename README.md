@@ -2,6 +2,9 @@
 
 A CLI tool for fetching web pages and converting them to Markdown format while preserving images.
 
+[![npm version](https://badge.fury.io/js/fetch-md.svg)](https://www.npmjs.com/package/fetch-md)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Features
 
 - 🚀 Fast and efficient web page fetching
@@ -16,12 +19,17 @@ A CLI tool for fetching web pages and converting them to Markdown format while p
 ## Installation
 
 ```bash
-# Using npm
+# Install globally with npm
 npm install -g fetch-md
 
-# Or using bun
+# Or install with bun if you prefer
 bun install -g fetch-md
+
+# Verify installation
+fetmd --version
 ```
+
+After installation, the `fetmd` command will be available globally in your terminal.
 
 ## Usage
 
@@ -122,14 +130,12 @@ output/
 
 ## Requirements
 
-- [Bun](https://bun.sh) runtime (version 1.0.0 or higher)
-- Node.js (version 14.17.0 or higher)
-- macOS, Linux, or WSL for Windows users
+- Node.js 14.17.0 or higher
+- Supported platforms:
+  - macOS
+  - Linux
+  - Windows (via WSL)
 
 ## License
 
 MIT
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
