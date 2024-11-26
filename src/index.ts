@@ -65,22 +65,10 @@ export async function fetchToMarkdown(url: string, options: FetchOptions = {}): 
       failedImages = processedImages.filter(img => !img.localPath).map(img => img.url);
     }
 
-    // Update HTML with new image references if we have processed images
+    // Convert HTML to Markdown
     progressCallback('convert', 0, 1);
-    let updatedHtml = html;
-    if (processedImages.length > 0) {
-      const imageService = pageService.getImageService();
-      updatedHtml = await imageService.updateImageReferences(html, processedImages.reduce((map, img) => {
-        if (img.localPath) {
-          map.set(img.url, join(imageSubDir, img.localPath));
-        }
-        return map;
-      }, new Map<string, string>()));
-    }
-
-    // Convert to markdown
     const markdownService = new MarkdownService(turndownOptions);
-    let markdown = markdownService.convertToMarkdown(updatedHtml);
+    let markdown = markdownService.convertToMarkdown(html);
     
     // Add title and clean up
     const cleanTitle = title.split('-').map(word => 
