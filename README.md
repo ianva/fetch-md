@@ -13,6 +13,8 @@ A CLI tool for fetching web pages and converting them to Markdown format while p
 - 🎨 Supports background images (optional)
 - 📊 Progress bars and status indicators
 - 📥 Pipe support for batch processing
+- 🔄 Self-update capability
+- 🔍 Debug mode for troubleshooting
 
 ## Installation
 
@@ -25,6 +27,9 @@ bun install -g fetch-md
 
 # Verify installation
 fetmd --version
+
+# Check for updates
+fetmd update
 ```
 
 After installation, the `fetmd` command will be available globally in your terminal.
@@ -42,6 +47,9 @@ fetmd https://example.com output
 
 # Save to a specific path
 fetmd https://example.com ~/Documents/notes
+
+# Only output the markdown file path
+fetmd https://example.com -p
 ```
 
 ### Advanced Options
@@ -52,6 +60,15 @@ fetmd https://example.com -b
 
 # Quiet mode (only errors)
 fetmd https://example.com -q
+
+# Debug mode for troubleshooting
+fetmd https://example.com -d
+
+# Wait for a specific element
+fetmd https://example.com -s "#content"
+
+# Wait before processing
+fetmd https://example.com -w 2000
 ```
 
 ### Batch Processing
@@ -76,8 +93,13 @@ echo "https://github.com" | fetmd output
 | [output] | Output directory (optional) |
 | -b, --background | Include background images |
 | -q, --quiet | Quiet mode - only show errors |
+| -d, --debug | Enable debug output |
+| -p, --path-only | Only output the markdown file path |
+| -w, --wait \<ms> | Wait time in milliseconds before processing |
+| -s, --selector \<selector> | Wait for a specific CSS selector |
 | -h, --help | Show help information |
 | -V, --version | Show version number |
+| update | Check for and install updates |
 
 ## Output Structure
 
@@ -110,7 +132,23 @@ output/
    fetmd https://example.com output -b
    ```
 
-4. **Batch process multiple URLs:**
+4. **Get only the output file path:**
+   ```bash
+   fetmd https://example.com -p
+   # Output: /path/to/output/example-domain/example-domain.md
+   ```
+
+5. **Debug mode with path output:**
+   ```bash
+   fetmd https://example.com -p -d
+   ```
+
+6. **Wait for specific content:**
+   ```bash
+   fetmd https://example.com -w 2000 -s "#main-content"
+   ```
+
+7. **Batch process multiple URLs:**
    ```bash
    # Create a file with URLs
    echo "https://example.com
