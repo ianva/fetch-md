@@ -30,10 +30,12 @@ export class PageService {
       this.title = document.title || new URL(url).hostname;
       // Clean the title to be used as a directory name
       this.title = this.title
+        .trim()
         .replace(/[^a-zA-Z0-9-_]/g, '-') // Replace invalid chars with dash
         .replace(/-+/g, '-')             // Replace multiple dashes with single dash
         .replace(/^-|-$/g, '')           // Remove leading/trailing dashes
-        .toLowerCase();
+        .toLowerCase()                    // Convert to lowercase
+        || 'untitled';                   // Fallback if title is empty
 
       // For Org mode HTML documents, try to get the content div first
       const contentDiv = document.querySelector('#content, .content, article, main');
