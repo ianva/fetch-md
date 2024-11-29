@@ -4,7 +4,7 @@ import { Command } from 'commander';
 import ora from 'ora';
 import chalk from 'chalk';
 import { createInterface } from 'readline';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { fetchToMarkdown } from './index';
 import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
@@ -71,9 +71,9 @@ program
   .option('-d, --debug', 'Enable debug output')
   .option('-q, --quiet', 'Suppress progress output')
   .action(async (url: string, outputDir: string, options: any) => {
-    const stdoutMode = !outputDir || process.stdout.isTTY === false;
+    const stdoutMode = (!outputDir && !options.pathOnly) || process.stdout.isTTY === false;
     const isRedirected = !process.stdout.isTTY;
-    const showProgress = !options.debug && !options.quiet && process.stderr.isTTY;
+    const showProgress = !options.debug && !options.quiet && !options.pathOnly && process.stderr.isTTY;
     
     let spinner: any = null;
     
@@ -121,17 +121,13 @@ program
       }
 
       const result = await fetchToMarkdown(url, {
-        outputDir: finalOutputDir,
+        outputDir: resolve(outputDir || process.cwd()),  // Use absolute path
         waitTime: parseInt(options.wait),
         waitForSelector: options.selector,
         includeBackgroundImages: options.background,
-        viewport: {
-          width: 1920,
-          height: 1080
-        },
-        stdoutMode,
-        quiet: options.quiet,
         debug: options.debug,
+        quiet: options.quiet || options.pathOnly,  // Be quiet if we're only showing path
+        stdoutMode: false,  // Never use stdout mode when -p is used
         progressCallback: (phase: string, current: number, total: number, item?: string) => {
           if (options.debug) {
             process.stderr.write(`Debug: Progress - ${phase} (${current}/${total})\n`);
@@ -172,14 +168,12 @@ program
       // Stop spinner before any output
       cleanup();
 
-      // Always check pathOnly first, regardless of redirection
       if (options.pathOnly && result.outputPath) {
-        process.stdout.write(result.outputPath);
-        process.stdout.write('\n');
+        // Output only the absolute path when -p option is used
+        process.stdout.write(resolve(result.outputPath) + '\n');
       } else if (isRedirected || stdoutMode) {
         // If stdout is redirected or in stdout mode, output the markdown content
-        process.stdout.write(result.markdown);
-        process.stdout.write('\n');
+        process.stdout.write(result.markdown + '\n');
       } else {
         if (showProgress) {
           const successSpinner = ora({

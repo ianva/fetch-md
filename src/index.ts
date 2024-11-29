@@ -29,7 +29,7 @@ export async function fetchToMarkdown(url: string, options: FetchToMarkdownOptio
     waitForSelector,
     includeBackgroundImages = false,
     viewport = { width: 1920, height: 1080 },
-    stdoutMode = !outputDir,
+    stdoutMode = false,
     quiet = stdoutMode,
     debug = false,
     turndownOptions = {},

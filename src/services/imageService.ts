@@ -15,29 +15,29 @@ export class ImageService {
   async saveImage(imageUrl: string, outputPath: string): Promise<boolean> {
     try {
       if (!imageUrl) {
-        console.warn('Empty image URL provided');
+        process.stderr.write('Empty image URL provided\n');
         return false;
       }
 
       const response = await fetch(imageUrl);
       
       if (!response.ok) {
-        console.warn(`Invalid image response for ${imageUrl}: ${response.status}`);
+        process.stderr.write(`Invalid image response for ${imageUrl}: ${response.status}\n`);
         return false;
       }
 
       const contentType = response.headers.get('content-type') || '';
       if (!contentType.includes('image/') && !contentType.includes('application/svg+xml')) {
-        console.warn(`Invalid content type for ${imageUrl}: ${contentType}`);
+        process.stderr.write(`Invalid content type for ${imageUrl}: ${contentType}\n`);
         return false;
       }
 
       const buffer = await response.arrayBuffer();
       await writeFile(outputPath, Buffer.from(buffer));
-      console.log(`Saved image to: ${outputPath}`);
+      process.stderr.write(`Saved image to: ${outputPath}\n`);
       return true;
     } catch (error) {
-      console.warn(`Failed to save image ${imageUrl}:`, error);
+      process.stderr.write(`Failed to save image ${imageUrl}: ${error}\n`);
       return false;
     }
   }
@@ -90,7 +90,7 @@ export class ImageService {
       try {
         return new URL(url, this.baseUrl).href;
       } catch {
-        console.warn(`Could not resolve URL: ${url}`);
+        process.stderr.write(`Could not resolve URL: ${url}\n`);
         return '';
       }
     }
@@ -135,7 +135,7 @@ export class ImageService {
         batch.map(async (img) => {
           const ext = this.getImageExtension(img.url);
           if (!ext) {
-            console.warn(`Could not determine extension for ${img.url}`);
+            process.stderr.write(`Could not determine extension for ${img.url}\n`);
             return { ...img, localPath: '' };
           }
 
@@ -150,7 +150,7 @@ export class ImageService {
           }
 
           if (success) {
-            console.log(`Successfully downloaded: ${filename}`);
+            process.stderr.write(`Successfully downloaded: ${filename}\n`);
             return { ...img, localPath: filename };
           } else {
             return { ...img, localPath: '' };
